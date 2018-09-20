@@ -18,6 +18,7 @@ def cutsyms(str):
     new_str = re.sub('[,.''""?/{}()=+_<>!`~@#$%^&*]'," ",str)
     return new_str
 
+# 词干提取
 def stemming(str):
     s = nltk.stem.SnowballStemmer('english')
     segs = str.replace('\n', '').lower().split(' ')
