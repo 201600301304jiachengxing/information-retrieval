@@ -2,6 +2,7 @@ import os
 import chardet
 import re
 import nltk
+import math
 
 # 去除停用词
 def cutstopwords(str):
@@ -27,9 +28,23 @@ def stemming(str):
         new_str = new_str + " " + s.stem(seg)
     return new_str
 
+# 统计词出现次数
+def wordcount(str):
+    strl_ist = str.replace('\n','').lower().split(' ')
+    count_dict = {}
+    for str in strl_ist:
+        if str in count_dict.keys():
+            count_dict[str] = count_dict[str] + 1
+        else:
+            count_dict[str] = 1
+    # count_list=sorted(count_dict.items(),key=lambda x:x[1],reverse=True)
+    # count_dict.remove(count_list[0])
+    return count_dict
+
 # 读取文本
 def readtxt(path):
-    context = ""
+    global num_txt;
+    all_context = ""
     for dirName, subdirList, fileList in os.walk(path):
         fileList.remove(fileList[0])
         for fname in fileList:
@@ -41,24 +56,40 @@ def readtxt(path):
             print(fname)
             fname = open(fname,'r+',encoding=chardet.detect(data)['encoding'])
             str = fname.read()
-            context = context + " " + str
+            all_context = all_context + "\n" + str
+            num_txt = num_txt + 1
             fname.close()
-    return context
+    return all_context
 
-# 统计词出现次数
-def wordcount(str):
-    strl_ist = str.replace('\n','').lower().split(' ')
-    count_dict = {}
-    for str in strl_ist:
-        if str in count_dict.keys():
-            count_dict[str] = count_dict[str] + 1
-        else:
-            count_dict[str] = 1
-    count_list=sorted(count_dict.items(),key=lambda x:x[1],reverse=True)
-    count_list.remove(count_list[0])
-    return count_list
 
-context="""The US media reports suggest Robert Mueller's inquiry has taken the first step towards possible criminal charges.
+#全部文本读取
+context = readtxt("/Users/apple/Desktop/ir/news")
+num_txt = 0
+num_dict = {}
+
+#预处理
+context = re.sub('[,.''""?/{}()=+_<>!`~@#$%^&*]'," ",context)
+context = cutstopwords(context)
+context = stemming(context)
+
+#数据存储
+full_path = '/Users/apple/Desktop/ir/news/text.txt'
+file = open(full_path,'a+')
+file.write(context)
+file.close()
+
+context = wordcount(context)
+
+#词频等信息记录
+for items in context.keys():
+    if items not in num_dict:
+        num_dict[items] = 1
+    else:
+        num_dict[items] = num_dict[items] + 1
+
+
+#样例文本测试，如需计算全部文本的词向量可树形遍历文件
+ins_context="""The US media reports suggest Robert Mueller's inquiry has taken the first step towards possible criminal charges.
 According to Reuters news agency, the jury has issued subpoenas over a June 2016 meeting between President Donald Trump's son and a Russian lawyer.
 The president has poured scorn on any suggestion his team colluded with the Kremlin to beat Hillary Clinton.
 In the US, grand juries are set up to consider whether evidence in any case is strong enough to issue indictments for a criminal trial. They do not decide the innocence or guilt of a potential defendant.
@@ -81,12 +112,26 @@ Ty Cobb, a lawyer appointed last month as White House special counsel, said in a
 "The White House is committed to fully co-operating with Mr Mueller."
 Earlier on Thursday, the US Senate introduced two separate cross-party bills designed to limit the Trump administration's ability to fire Mr Mueller.
 The measures were submitted amid concern the president might dismiss Mr Mueller, as he fired former FBI director James Comey in May, citing the Russia inquiry in his decision."""
-#context = readtxt("/Users/apple/Desktop/ir/news")
 
-#预处理
-context = re.sub('[,.''""?/{}()=+_<>!`~@#$%^&*]'," ",context)
-context = cutstopwords(context)
-context = stemming(context)
-context = wordcount(context)
+ins_d = {}
+ins_context = re.sub('[,.''""?/{}()=+_<>!`~@#$%^&*]'," ",ins_context)
+ins_context = cutstopwords(ins_context)
+ins_context = stemming(ins_context)
+ins_context = wordcount(ins_context)
 
-#
+for items in context.keys():
+    if items not in ins_context.keys():
+        ins_d[items] = 0
+    else:
+        ins_d[items] = context[items]
+
+#tf_idf
+sum = 0
+for seg in ins_d.keys():
+    sum = sum + ins_d[seg]
+for seg in ins_d.keys():
+    tf = ins_d[seg]/sum
+    idf = math.log(num_txt/num_dict[seg])
+    ins_d[seg] = tf*idf
+
+print(ins_d)
