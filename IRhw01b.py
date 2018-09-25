@@ -130,7 +130,7 @@ for dirName, subdirList, fileList in os.walk('/Users/apple/Desktop/ir/news'):
 
         #full_path = '/Users/apple/Desktop/ir/vsmresult.txt'
         #file = open(full_path, 'a+')
-        #file.write(context)
+        #file.write(ins_dict)
         #file.close()
 
 
