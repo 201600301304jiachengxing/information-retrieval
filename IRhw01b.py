@@ -85,11 +85,16 @@ context = readtxt("/Users/apple/Desktop/ir/news")
 
 #全部文档记数
 str_dict = wordcount(context)
-length = len(num_dict)
+new_dict = str_dict
+str_dict = {}
+for seg in new_dict:
+    if (new_dict[seg] > 10) & (new_dict[seg] < 1000):
+        str_dict[seg] = new_dict[seg]
+length = len(str_dict)
 print(length)
 
 #数据存储
-full_path = '/Users/apple/Desktop/ir/altext.txt'
+full_path = '/Users/apple/Desktop/ir/altext01.txt'
 file = open(full_path,'a+')
 file.write(context)
 file.close()
@@ -118,21 +123,22 @@ for dirName, subdirList, fileList in os.walk('/Users/apple/Desktop/ir/news'):
 
         # tf_idf
         sum = 0
-        out_str = ""
+        outstr = ""
         for seg in ins_dict.keys():
             sum = sum + ins_dict[seg]
         for seg in ins_dict.keys():
             tf = ins_dict[seg] / sum
-            if seg in num_dict.keys():
+            if seg in  str_dict.keys():
                 idf = math.log(num_txt / num_dict[seg])
             else:
-                idf = 1
+                idf = 0
             ins_dict[seg] = tf * idf
-            out_str = out_str + seg + ":" + str(ins_dict[seg]) + " "
+            if ins_dict[seg]!=0:
+                outstr = outstr + seg + ":" + str(ins_dict[seg]) + " "
 
-        full_path = '/Users/apple/Desktop/ir/vsmresult.txt'
+        full_path = '/Users/apple/Desktop/ir/vsmresult01.txt'
         file = open(full_path, 'a+')
-        file.write(ins_dict+"\n\n")
+        file.write(outstr+"\n\n")
         file.close()
 
 
