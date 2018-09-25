@@ -118,6 +118,7 @@ for dirName, subdirList, fileList in os.walk('/Users/apple/Desktop/ir/news'):
 
         # tf_idf
         sum = 0
+        out_str = ""
         for seg in ins_dict.keys():
             sum = sum + ins_dict[seg]
         for seg in ins_dict.keys():
@@ -127,11 +128,12 @@ for dirName, subdirList, fileList in os.walk('/Users/apple/Desktop/ir/news'):
             else:
                 idf = 1
             ins_dict[seg] = tf * idf
+            out_str = out_str + seg + ":" + str(ins_dict[seg]) + " "
 
-        #full_path = '/Users/apple/Desktop/ir/vsmresult.txt'
-        #file = open(full_path, 'a+')
-        #file.write(ins_dict)
-        #file.close()
+        full_path = '/Users/apple/Desktop/ir/vsmresult.txt'
+        file = open(full_path, 'a+')
+        file.write(ins_dict+"\n\n")
+        file.close()
 
 
 
