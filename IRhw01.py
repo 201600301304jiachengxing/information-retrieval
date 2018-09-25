@@ -1,3 +1,6 @@
+## 该文件已被IRhw01a.py替代
+
+
 import os
 import chardet
 import re
