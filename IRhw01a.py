@@ -1,3 +1,5 @@
+#该文件已被IRhw01b替代
+
 import os
 import chardet
 import re
