@@ -3,6 +3,7 @@ import chardet
 import re
 import nltk
 import numpy
+import math
 
 # 去除停用词
 def cutstopwords(str):
@@ -103,8 +104,10 @@ str_dict = wordcount(context)
 new_dict = str_dict
 str_dict = {}
 for seg in new_dict:
-    if (new_dict[seg] > 5) & (new_dict[seg] < 1500):
+    if (new_dict[seg] > 10) & (new_dict[seg] < 10000):
         str_dict[seg] = new_dict[seg]
+if '' in str_dict.keys():
+    str_dict.pop('')
 length = len(str_dict)
 print(length)
 
@@ -146,19 +149,24 @@ for dirName, subdirList, fileList in os.walk('/Users/apple/Desktop/ir/test'):
         ins_str = stemming(ins_str)
         ins_dict = wordcount(ins_str)
 
-        class_pro = [1]*20
+        class_pro = [0]*20
         for i in class_list.keys():
             y_num = class_list[i]
             for seg in ins_dict.keys():
                 if seg in class_dict[i].keys():
-                    class_pro[y_num] = class_pro[y_num] * ((class_dict[i][seg]+1)/(class_sum[y_num]+200)) * ((class_num[y_num])/(5000))
+                    class_pro[y_num] = class_pro[y_num] + math.log((class_dict[i][seg]+1)/(class_sum[y_num]+20))
                 else:
-                    class_pro[y_num] = class_pro[y_num] * ((1)/(class_sum[y_num]+200)) * ((class_num[y_num])/(5000))
+                    class_pro[y_num] = class_pro[y_num] + math.log((1)/(class_sum[y_num]+20))
+            class_pro[y_num] = class_pro[y_num] + math.log((class_num[y_num])/(2000))
 
         index = numpy.argmax(class_pro)
         classification[num][index] = classification[num][index] + 1
 
+sum = 0
+for i in range(20):
+    sum = sum + classification[i][i]
 print(classification)
+print(sum/2000)
 
 
 
