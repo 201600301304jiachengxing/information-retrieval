@@ -37,8 +37,8 @@ for line in file:
     tweets.append(json.loads(line))
     tweets[counts]['text'] = tweets[counts]['text'].lower()
     tweets[counts]['text'] = cutsyms(tweets[counts]['text'])
-    tweets[counts]['text'] = cutstopwords(tweets[counts]['text'])
-    tweets[counts]['text'] = stemming(tweets[counts]['text'])
+    #tweets[counts]['text'] = cutstopwords(tweets[counts]['text'])
+    #tweets[counts]['text'] = stemming(tweets[counts]['text'])
     for seg in tweets[counts]['text'].split(' '):
         if seg in twords:
             length = len(twords[seg])
@@ -51,6 +51,7 @@ for line in file:
             twords[seg].append(counts)
     counts = counts + 1
     print(counts)
+file.close()
 
 def fAnd(listA,listB):
     list = []
@@ -120,9 +121,18 @@ def fNot(listA):
                     ca = ca + 1
     return list
 
-# 函数测试
-print(fNot(twords['eb']))
-print(fAnd(twords['home'],twords['circl']))
-print(fOr(twords['circl'],twords['home']))
-file.close()
+# 使用函数实现简单的二元关系的检索
+test = 'home OR circle'
+test = cutsyms(test)
+tlist = test.split(' ')
+print(tlist[1])
+
+if tlist[1]=='AND':
+    print(fAnd(twords[tlist[0]],twords[tlist[2]]))
+if tlist[1]=='OR':
+    print(fOr(twords[tlist[0]],twords[tlist[2]]))
+if tlist[1]=='NOT':
+    print(fNot(twords[tlist[0]]))
+
+
 
