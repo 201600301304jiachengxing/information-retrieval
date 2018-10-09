@@ -134,5 +134,26 @@ if tlist[1]=='OR':
 if tlist[1]=='NOT':
     print(fNot(twords[tlist[0]]))
 
+# 使用函数实现简单的多元关系的检索,对于NOT的处理仅限于文首,不识别括号,无对频率进行判断
+test = 'NOT home AND house OR circle'
+test = cutsyms(test)
+tlist = test.split(' ')
+tcount = {}
+tlen = len(tlist)
+
+for i in range(tlen):
+    if tlist[i] == 'AND':
+        tcount[i+1] = twords[tlist[i+1]]
+        tcount[i+1] = fAnd(tcount[i-1], tcount[i+1])
+    elif tlist[i] == 'OR':
+        tcount[i+1] = twords[tlist[i+1]]
+        tcount[i+1] = fOr(tcount[i-1], tcount[i+1])
+    elif tlist[i] == 'NOT':
+        tcount[i+1] = twords[tlist[i+1]]
+        tcount[i+1] = fNot(tcount[i+1])
+    elif i not in tcount.keys():
+        tcount[i] = twords[tlist[i]]
+
+print(tcount[tlen-1])
 
 
