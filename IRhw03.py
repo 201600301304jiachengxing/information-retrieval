@@ -1,6 +1,5 @@
 import json
 import nltk
-import numpy
 import re
 
 # 去除停用词
@@ -48,7 +47,7 @@ for line in file:
         else:
             twords[seg] = []
             twords[seg].append(1)
-            twords[seg].append(counts)
+            twords[seg].append(counts+1)
     counts = counts + 1
     print(counts)
 file.close()
@@ -69,12 +68,6 @@ def fAnd(listA,listB):
                 cb = cb + 1
             else:
                 ca = ca + 1
-        if (ca==la):
-            if (listA[ca-1]<listB[cb]):
-                break
-        if (cb==lb):
-            if (listB[cb-1]<listA[ca]):
-                break
     return list
 
 def fOr(listA,listB):
@@ -95,16 +88,14 @@ def fOr(listA,listB):
             else:
                 list.append(listA[ca])
                 ca = ca + 1
-        if (ca==la):
-            if (listA[ca-1]<listB[cb]):
-                for i in range(cb,lb):
-                    list.append(listB[i])
-                break
-        if (cb==lb):
-            if (listB[cb-1]<listA[ca]):
-                for i in range(ca,la):
-                    list.append(listA[i])
-                break
+        if (ca==la)&(cb<lb):
+            for i in range(cb, lb):
+                list.append(listB[i])
+            break
+        if (cb==lb)&(ca<la):
+            for i in range(ca, la):
+                list.append(listA[i])
+            break
     return list
 
 def fNot(listA):
@@ -121,20 +112,9 @@ def fNot(listA):
                     ca = ca + 1
     return list
 
-# 使用函数实现简单的二元关系的检索
-test = 'home OR circle'
-test = cutsyms(test)
-tlist = test.split(' ')
-print(tlist[1])
+print(twords.keys())
 
-if tlist[1]=='AND':
-    print(fAnd(twords[tlist[0]],twords[tlist[2]]))
-if tlist[1]=='OR':
-    print(fOr(twords[tlist[0]],twords[tlist[2]]))
-if tlist[1]=='NOT':
-    print(fNot(twords[tlist[0]]))
-
-# 使用函数实现简单的多元关系的检索,对于NOT的处理仅限于文首,不识别括号,无对频率进行判断
+# 使用函数实现简单的多元关系的检索
 test = 'NOT home AND house OR circle'
 test = cutsyms(test)
 tlist = test.split(' ')
@@ -156,4 +136,39 @@ for i in range(tlen):
 
 print(tcount[tlen-1])
 
+# 使用函数实现一定程度的多元关系的检索
+test = 'NOT home AND house AND kill OR NOT circle AND unlikely AND NOT idealism AND optimist'
+test = cutsyms(test)
+tlist = test.split(' ')
+tcount = {}
 
+i=0
+while i<len(tlist):
+    if tlist[i] == 'NOT':
+        tcount[tlist[i+1]] = fNot(twords[tlist[i+1]])
+        tlist.remove(tlist[i])
+        i=i-1
+    i=i+1
+
+print(tlist)
+i=0
+while i<len(tlist):
+    if tlist[i] == 'AND':
+        tcount[tlist[i+1]] = fAnd(twords[tlist[i-1]],twords[tlist[i+1]])
+        tlist.remove(tlist[i])
+        tlist.remove(tlist[i-1])
+        i=i-2
+    i=i+1
+
+print(tlist)
+i=0
+while i<len(tlist):
+    if tlist[i] == 'OR':
+        tcount[tlist[i+1]] = fOr(twords[tlist[i-1]],twords[tlist[i+1]])
+        tlist.remove(tlist[i])
+        tlist.remove(tlist[i-1])
+        i=i-2
+    i=i+1
+
+print(tlist)
+print(tcount[tlist[len(tlist)-1]])
