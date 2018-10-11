@@ -114,28 +114,6 @@ def fNot(listA):
 
 print(twords.keys())
 
-# 使用函数实现简单的多元关系的检索
-test = 'NOT home AND house OR circle'
-test = cutsyms(test)
-tlist = test.split(' ')
-tcount = {}
-tlen = len(tlist)
-
-for i in range(tlen):
-    if tlist[i] == 'AND':
-        tcount[i+1] = twords[tlist[i+1]]
-        tcount[i+1] = fAnd(tcount[i-1], tcount[i+1])
-    elif tlist[i] == 'OR':
-        tcount[i+1] = twords[tlist[i+1]]
-        tcount[i+1] = fOr(tcount[i-1], tcount[i+1])
-    elif tlist[i] == 'NOT':
-        tcount[i+1] = twords[tlist[i+1]]
-        tcount[i+1] = fNot(tcount[i+1])
-    elif i not in tcount.keys():
-        tcount[i] = twords[tlist[i]]
-
-print(tcount[tlen-1])
-
 # 使用函数实现一定程度的多元关系的检索，先处理not，后处理and，最后处理or
 test = 'NOT home AND house AND NOT sarge OR NOT circle AND unlikely AND NOT recall'
 test = cutsyms(test)
