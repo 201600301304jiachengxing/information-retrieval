@@ -56,8 +56,8 @@ def fAnd(listA,listB):
     list = []
     la = len(listA)
     lb = len(listB)
-    ca = 1
-    cb = 1
+    ca = 0
+    cb = 0
     while (ca!=la)&(cb!=lb):
         if (listA[ca]==listB[cb]):
             list.append(listA[ca])
@@ -74,8 +74,8 @@ def fOr(listA,listB):
     list = []
     la = len(listA)
     lb = len(listB)
-    ca = 1
-    cb = 1
+    ca = 0
+    cb = 0
     while (ca!=la)&(cb!=lb):
         if (listA[ca]==listB[cb]):
             list.append(listA[ca])
@@ -101,7 +101,7 @@ def fOr(listA,listB):
 def fNot(listA):
     la = len(listA)
     list = []
-    ca = 1
+    ca = 0
     global counts
     for i in range(counts):
         if ca<la:
@@ -136,39 +136,45 @@ for i in range(tlen):
 
 print(tcount[tlen-1])
 
-# 使用函数实现一定程度的多元关系的检索
-test = 'NOT home AND house AND kill OR NOT circle AND unlikely AND NOT idealism AND optimist'
+# 使用函数实现一定程度的多元关系的检索，先处理not，后处理and，最后处理or
+test = 'NOT home AND house AND NOT sarge OR NOT circle AND unlikely AND NOT recall'
 test = cutsyms(test)
 tlist = test.split(' ')
 tcount = {}
 
 i=0
 while i<len(tlist):
+    if (tlist[i]!='NOT')&(tlist[i]!='AND')&(tlist[i]!='OR'):
+        tcount[tlist[i]] = twords[tlist[i]][1:len(twords[tlist[i]])]
+    i=i+1
+
+i=0
+while i<len(tlist):
     if tlist[i] == 'NOT':
-        tcount[tlist[i+1]] = fNot(twords[tlist[i+1]])
+        tcount[tlist[i+1]] = fNot(tcount[tlist[i+1]])
         tlist.remove(tlist[i])
         i=i-1
     i=i+1
-
 print(tlist)
+
 i=0
 while i<len(tlist):
     if tlist[i] == 'AND':
-        tcount[tlist[i+1]] = fAnd(twords[tlist[i-1]],twords[tlist[i+1]])
+        tcount[tlist[i+1]] = fAnd(tcount[tlist[i-1]],tcount[tlist[i+1]])
         tlist.remove(tlist[i])
         tlist.remove(tlist[i-1])
-        i=i-2
+        i=i-1
     i=i+1
-
 print(tlist)
+
 i=0
 while i<len(tlist):
     if tlist[i] == 'OR':
-        tcount[tlist[i+1]] = fOr(twords[tlist[i-1]],twords[tlist[i+1]])
+        tcount[tlist[i+1]] = fOr(tcount[tlist[i-1]],tcount[tlist[i+1]])
         tlist.remove(tlist[i])
         tlist.remove(tlist[i-1])
-        i=i-2
+        i=i-1
     i=i+1
-
 print(tlist)
-print(tcount[tlist[len(tlist)-1]])
+
+print(tcount[tlist[len(tlist)-1]]) #result=[1, 52]
