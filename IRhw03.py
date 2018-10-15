@@ -32,6 +32,7 @@ file = open(path,'r',encoding='UTF-8',errors='ignore')
 tweets = []
 twords = {}
 counts = 0
+alist = []
 for line in file:
     tweets.append(json.loads(line))
     tweets[counts]['text'] = tweets[counts]['text'].lower()
@@ -49,6 +50,7 @@ for line in file:
             twords[seg].append(1)
             twords[seg].append(counts+1)
     counts = counts + 1
+    alist.append(counts)
     print(counts)
 file.close()
 
@@ -114,45 +116,70 @@ def fNot(listA):
 
 print(twords.keys())
 
-# 使用函数实现一定程度的多元关系的检索，先处理not，后处理and，最后处理or
-test = 'NOT home AND house AND NOT sarge OR NOT circle AND unlikely AND NOT recall'
-test = cutsyms(test)
-tlist = test.split(' ')
-tcount = {}
+def testA(test):
+    # 使用函数实现一定程度的多元关系的检索
+    # test = 'NOT home AND house AND NOT sarge OR NOT circle AND unlikely AND NOT recall'
+    test = cutsyms(test)
+    tlist = test.split(' ')
+    tcount = {}
+    i = 0
+    while i < len(tlist):
+        if (tlist[i] != 'NOT') & (tlist[i] != 'AND') & (tlist[i] != 'OR'):
+            tcount[tlist[i]] = twords[tlist[i]][1:len(twords[tlist[i]])]
+        i = i + 1
+    i = 0
+    while i < len(tlist):
+        if tlist[i] == 'NOT':
+            tcount[tlist[i + 1]] = fNot(tcount[tlist[i + 1]])
+            tlist.remove(tlist[i])
+            i = i - 1
+        i = i + 1
+    print(tlist)
+    i = 0
+    while i < len(tlist):
+        if tlist[i] == 'AND':
+            tcount[tlist[i + 1]] = fAnd(tcount[tlist[i - 1]], tcount[tlist[i + 1]])
+            tlist.remove(tlist[i])
+            tlist.remove(tlist[i - 1])
+            i = i - 1
+        i = i + 1
+    print(tlist)
+    i = 0
+    while i < len(tlist):
+        if tlist[i] == 'OR':
+            tcount[tlist[i + 1]] = fOr(tcount[tlist[i - 1]], tcount[tlist[i + 1]])
+            tlist.remove(tlist[i])
+            tlist.remove(tlist[i - 1])
+            i = i - 1
+        i = i + 1
+    print(tlist)
+    print(tcount[tlist[len(tlist) - 1]])
 
-i=0
-while i<len(tlist):
-    if (tlist[i]!='NOT')&(tlist[i]!='AND')&(tlist[i]!='OR'):
-        tcount[tlist[i]] = twords[tlist[i]][1:len(twords[tlist[i]])]
-    i=i+1
+def qTest():
+    # query
+    path = '/Users/apple/Desktop/ir/hw3/topics.MB171-225.txt'
+    file = open(path, 'r', encoding='UTF-8', errors='ignore')
+    txt = file.read()
+    file.close()
+    txt.replace('\n', ' ')
+    txtlist = txt.split(' ')
+    q = 0
+    for i in range(len(txtlist)):
+        if txtlist[i] == '</num>\n<query>':
+            q = q + 1
+            i = i + 1
+            klist = alist
+            while txtlist[i] != '</query>\n<querytime>':
+                txtlist[i] = cutsyms(txtlist[i])
+                if txtlist[i] in twords:
+                    klist = fAnd(klist, twords[txtlist[i]])
+                i = i + 1
+            if klist == alist:
+                klist = []
+            print(q)
+            print(klist)
 
-i=0
-while i<len(tlist):
-    if tlist[i] == 'NOT':
-        tcount[tlist[i+1]] = fNot(tcount[tlist[i+1]])
-        tlist.remove(tlist[i])
-        i=i-1
-    i=i+1
-print(tlist)
+qTest()
 
-i=0
-while i<len(tlist):
-    if tlist[i] == 'AND':
-        tcount[tlist[i+1]] = fAnd(tcount[tlist[i-1]],tcount[tlist[i+1]])
-        tlist.remove(tlist[i])
-        tlist.remove(tlist[i-1])
-        i=i-1
-    i=i+1
-print(tlist)
 
-i=0
-while i<len(tlist):
-    if tlist[i] == 'OR':
-        tcount[tlist[i+1]] = fOr(tcount[tlist[i-1]],tcount[tlist[i+1]])
-        tlist.remove(tlist[i])
-        tlist.remove(tlist[i-1])
-        i=i-1
-    i=i+1
-print(tlist)
 
-print(tcount[tlist[len(tlist)-1]]) #result=[1, 52]
