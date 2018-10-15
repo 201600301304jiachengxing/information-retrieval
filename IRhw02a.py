@@ -17,7 +17,7 @@ def cutstopwords(str):
 
 # 去除标点
 def cutsyms(str):
-    new_str = re.sub('[1234567890,.\'\"\t\n*_+=?/|!@#$%^&*()`~<>:;\-\[\]]'," ",str)
+    new_str = re.sub('[1234567890,.\'\"\t\n*_+=?/|@!#$%^&*()`~<>:;\-\[\]]'," ",str)
     return new_str
 
 # 词干提取
@@ -104,12 +104,11 @@ str_dict = wordcount(context)
 new_dict = str_dict
 str_dict = {}
 for seg in new_dict:
-    if (new_dict[seg] > 10) & (new_dict[seg] < 10000):
+    if (new_dict[seg] > 0) & (new_dict[seg] < 10000):
         str_dict[seg] = new_dict[seg]
 if '' in str_dict.keys():
     str_dict.pop('')
 length = len(str_dict)
-print(length)
 
 for i in class_list.keys():
     z_num = class_list[i]
@@ -126,6 +125,8 @@ for i in class_list.keys():
         class_sum[x_num] = class_sum[x_num] + class_dict[i][j]
 
 #classification
+top3_accuracy = 0
+
 classification = [[0 for x in range(20)]for y in range(20)]
 for dirName, subdirList, fileList in os.walk('/Users/apple/Desktop/ir/test'):
     fileList.remove(fileList[0])
@@ -154,19 +155,69 @@ for dirName, subdirList, fileList in os.walk('/Users/apple/Desktop/ir/test'):
             y_num = class_list[i]
             for seg in ins_dict.keys():
                 if seg in class_dict[i].keys():
-                    class_pro[y_num] = class_pro[y_num] + math.log((class_dict[i][seg]+1)/(class_sum[y_num]+20))
+                    class_pro[y_num] = class_pro[y_num] + math.log((class_dict[i][seg]+1)/(class_sum[y_num]+2))
                 else:
-                    class_pro[y_num] = class_pro[y_num] + math.log((1)/(class_sum[y_num]+20))
-            class_pro[y_num] = class_pro[y_num] + math.log((class_num[y_num])/(2000))
+                    class_pro[y_num] = class_pro[y_num] + math.log((1)/(class_sum[y_num]+2))
+            class_pro[y_num] = class_pro[y_num] + math.log((class_num[y_num])/(200))
 
         index = numpy.argmax(class_pro)
+        if index == num:
+            top3_accuracy = top3_accuracy + 1
+        else:
+            classtwo = [0] * 19
+            j = 0
+            for i in range(19):
+                if j != index:
+                    classtwo[i] = class_pro[j]
+                    j = j + 1
+                else:
+                    j = j + 1
+            index2 = numpy.argmax(classtwo)
+            if index2 == num:
+                top3_accuracy = top3_accuracy + 1
+            else:
+                classthree = [0] * 18
+                j = 0
+                for i in range(18):
+                    if j != index2:
+                        classthree[i] = classtwo[j]
+                        j = j + 1
+                    else:
+                        j = j + 1
+                index3 = numpy.argmax(classthree)
+                if index3 == num:
+                    top3_accuracy = top3_accuracy + 1
+
         classification[num][index] = classification[num][index] + 1
 
+
+recall = [0]*20
+precision = [0]*20
 sum = 0
 for i in range(20):
     sum = sum + classification[i][i]
-print(classification)
-print(sum/2000)
+    rows = 0
+    cols = 0
+    for j in range(20):
+        rows = rows + classification[i][j]
+    for j in range(20):
+        cols = cols + classification[j][i]
+    recall[i] = round(classification[i][i] / rows,4)
+    precision[i] = round(classification[i][i] / cols,4)
+
+alpha = 0.5
+f = [0]*20
+for i in range(20):
+    f[i] = round(1/((alpha)/recall[i]+(1-alpha)/precision[i]),4)
+
+print(length)
+print(sum/4000)
+print(top3_accuracy/4000)
+for i in range(20):
+    print(classification[i])
+print(recall)
+print(precision)
+print(f)
 
 
 
