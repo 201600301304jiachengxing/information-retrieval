@@ -103,8 +103,8 @@ def rank(string,top):
                 p = 0
                 q = 0
                 if seg in tdocnum[w].keys():
-                    p = (math.log((counts + 1) / twords[seg][0])) * (tdocnum[w][seg] / tdocword[w]) * (k + 1) * (tdocnum[w][seg] / tdocword[w]) / ((tdocnum[w][seg] / tdocword[w]) + k * (1 - b + b * tdocword[w] / avg))
-                    q = (math.log((counts + 1) / twords[seg][0])) * (tdocnum[w][seg] / tdocword[w]) * math.log(1 + math.log(1 + tdocnum[w][seg] / tdocword[w])) / (1 - b + b * tdocword[w] / avg)
+                    p = (math.log((counts + 1) / twords[seg][0])) * (k + 1) * (tdocnum[w][seg] / tdocword[w]) / ((tdocnum[w][seg] / tdocword[w]) + k * (1 - b + b * tdocword[w] / avg))
+                    q = (math.log((counts + 1) / twords[seg][0])) * math.log(1 + math.log(1 + tdocnum[w][seg] / tdocword[w])) / (1 - b + b * tdocword[w] / avg)
                 bm25[w] = bm25[w] + p
                 pivoted[w] = pivoted[w] + q
 
