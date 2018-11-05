@@ -86,25 +86,30 @@ def qTest():
 
             string = cutsyms(string)
             string = cutstopwords(string)
+            print(string)
             print(rank(string,5))
 
 
 def rank(string,top):
-    score = {}
+    bm25 = {}
+    pivoted = {}
     slist = string.lower().split(" ")
     for seg in slist:
         if seg != "":
             for w in range(counts):
-                if w not in score.keys():
-                    score[w] = 0
+                if w not in bm25.keys():
+                    bm25[w] = 0
+                    pivoted[w] = 0
                 p = 0
+                q = 0
                 if seg in tdocnum[w].keys():
-                    p = (math.log(counts / twords[seg][0])) * (tdocnum[w][seg] / tdocword[w]) * (k + 1) * (
-                            tdocnum[w][seg] / tdocword[w]) / (
-                                (tdocnum[w][seg] / tdocword[w]) + k * (1 - b + b * tdocword[w] / avg))
-                score[w] = score[w] + p
+                    p = (math.log((counts + 1) / twords[seg][0])) * (tdocnum[w][seg] / tdocword[w]) * (k + 1) * (tdocnum[w][seg] / tdocword[w]) / ((tdocnum[w][seg] / tdocword[w]) + k * (1 - b + b * tdocword[w] / avg))
+                    q = (math.log((counts + 1) / twords[seg][0])) * (tdocnum[w][seg] / tdocword[w]) * math.log(1 + math.log(1 + tdocnum[w][seg] / tdocword[w])) / (1 - b + b * tdocword[w] / avg)
+                bm25[w] = bm25[w] + p
+                pivoted[w] = pivoted[w] + q
 
-    sk = sorted(score.items(), key=lambda x: x[1], reverse=True)
-    return sk[0:top]
+    sk1 = sorted(bm25.items(), key=lambda x: x[1], reverse=True)
+    sk2 = sorted(pivoted.items(), key=lambda x: x[1], reverse=True)
+    return sk1[0:top],sk2[0:top]
 
 qTest()
