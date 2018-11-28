@@ -30,7 +30,7 @@ def stemming(str):
 k=2
 b=0.5
 
-path = '/Users/apple/Desktop/ir/hw3/tweets.txt'
+path = 'tweets.txt'
 file = open(path,'r',encoding='UTF-8',errors='ignore')
 tweets = []
 twords = {}
@@ -62,6 +62,8 @@ for line in file:
     print(counts)
 file.close()
 
+print(tweets[1])
+
 sum = 0
 avg = 0
 for i in range(counts):
@@ -76,6 +78,7 @@ def qTest():
     file.close()
     txt.replace('\n', ' ')
     txtlist = txt.split(' ')
+    numq=0;
     for i in range(len(txtlist)):
         if txtlist[i] == '</num>\n<query>':
             i = i + 1
@@ -84,11 +87,25 @@ def qTest():
                 string = string + txtlist[i] + " "
                 i = i + 1
 
+            numq = numq + 1
             string = cutsyms(string)
             string = cutstopwords(string)
             print(string)
-            print(rank(string,5))
 
+            [st1,st2]=rank(string,500)
+
+            for j in range(500):
+                outstr = str(numq + 170) + " " + tweets[st1[j][0]]['tweetId']
+                full_path = 'result500bm25.txt'
+                file = open(full_path, 'a+')
+                file.write(outstr + "\n")
+                file.close()
+
+                outstr = str(numq + 170) + " " + tweets[st2[j][0]]['tweetId']
+                full_path = 'result500pivo.txt'
+                file = open(full_path, 'a+')
+                file.write(outstr + "\n")
+                file.close()
 
 def rank(string,top):
     bm25 = {}
