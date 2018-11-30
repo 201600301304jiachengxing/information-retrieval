@@ -27,7 +27,7 @@ def stemming(str):
         new_str = new_str + " " + s.stem(seg)
     return new_str
 
-k=2
+k=10
 b=0.5
 
 path = 'tweets.txt'
@@ -41,8 +41,8 @@ for line in file:
     tweets.append(json.loads(line))
     tweets[counts]['text'] = tweets[counts]['text'].lower()
     tweets[counts]['text'] = cutsyms(tweets[counts]['text'])
-    #tweets[counts]['text'] = cutstopwords(tweets[counts]['text'])
-    #tweets[counts]['text'] = stemming(tweets[counts]['text'])
+    tweets[counts]['text'] = cutstopwords(tweets[counts]['text'])
+    tweets[counts]['text'] = stemming(tweets[counts]['text'])
     if counts not in tdocnum.keys():
         tdocnum[counts] = {}
     for seg in tweets[counts]['text'].split(' '):
@@ -61,8 +61,6 @@ for line in file:
     counts = counts + 1
     print(counts)
 file.close()
-
-print(tweets[1])
 
 sum = 0
 avg = 0
@@ -88,21 +86,23 @@ def qTest():
                 i = i + 1
 
             numq = numq + 1
+            string = string.lower()
             string = cutsyms(string)
             string = cutstopwords(string)
+            string = stemming(string)
             print(string)
 
-            [st1,st2]=rank(string,500)
+            [st1,st2]=rank(string,400)
 
-            for j in range(500):
+            for j in range(400):
                 outstr = str(numq + 170) + " " + tweets[st1[j][0]]['tweetId']
-                full_path = 'result500bm25.txt'
+                full_path = 'result400bm25.txt'
                 file = open(full_path, 'a+')
                 file.write(outstr + "\n")
                 file.close()
 
                 outstr = str(numq + 170) + " " + tweets[st2[j][0]]['tweetId']
-                full_path = 'result500pivo.txt'
+                full_path = 'result400pivo.txt'
                 file = open(full_path, 'a+')
                 file.write(outstr + "\n")
                 file.close()
