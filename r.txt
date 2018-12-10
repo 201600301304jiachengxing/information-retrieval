@@ -1,0 +1,33 @@
+load the data...
+
+method meanshift
+compute the result...
+NMI:0.65015
+
+method DBSCAN
+compute the result...
+NMI:0.707871
+
+method k_means
+compute the result...
+NMI:0.798497
+
+method Spectral
+compute the result...
+NMI:0.681795
+
+method ward
+compute the result...
+NMI:0.67917
+
+method Agglomerative
+compute the result...
+NMI:0.908023
+
+method AP
+compute the result...
+NMI:0.782623
+
+method GaussianMixture
+compute the result...
+NMI:0.813259
